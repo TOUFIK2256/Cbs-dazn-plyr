@@ -22,27 +22,27 @@
         
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* --- ব্র্যান্ডিং (একদম ছোট এবং কাছাকাছি) --- */
+        /* --- Branding (Logo + Text) --- */
         .brand-overlay {
             position: absolute; 
             top: 10px; right: 10px; 
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center;
             z-index: 50; 
-            opacity: 0.7; /* একটু ঝাপসা যাতে চোখে না লাগে */
+            opacity: 0.7; /* Slight opacity */
             pointer-events: none;
         }
 
         .brand-logo {
-            width: 25px; /* লোগো আরও ছোট করা হয়েছে */
+            width: 25px; /* Logo resized smaller */
             height: auto;
-            margin-bottom: -2px; /* লোগো এবং লেখার গ্যাপ কমানো হয়েছে */
+            margin-bottom: -2px; /* Gap reduced */
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
         }
 
         .brand-text {
             font-family: 'Permanent Marker', cursive;
-            font-size: 7px; /* লেখার সাইজ ছোট করা হয়েছে */
+            font-size: 7px; /* Font size reduced */
             color: #fff;
             text-shadow: 1px 1px 2px #000;
             letter-spacing: 0.5px;
@@ -52,7 +52,7 @@
             line-height: 1;
         }
 
-        /* স্পিনার */
+        /* Spinner */
         .spinner {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.2);
@@ -61,6 +61,7 @@
         }
         @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
+        /* Center Buttons */
         .center-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             display: flex; align-items: center; gap: 40px; z-index: 10; opacity: 0; transition: opacity 0.3s;
@@ -73,6 +74,7 @@
         .center-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
         .material-icons.large { font-size: 45px; } .material-icons.medium { font-size: 30px; }
 
+        /* Custom Controls */
         .custom-controls {
             position: absolute; 
             bottom: 0; left: 0; width: 100%;
@@ -92,6 +94,7 @@
         .material-icons { font-size: 28px; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
         .time-text { font-size: 13px; font-weight: bold; margin-left: 5px; cursor: pointer; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
 
+        /* Popup Menu */
         .popup-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 30; display: none; }
         .popup-menu {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -108,7 +111,7 @@
     <div class="video-container" id="video-container" onclick="handleContainerClick()">
         <video id="video" autoplay playsinline></video>
         
-        <!-- ব্র্যান্ডিং -->
+        <!-- Branding (Logo + Text) -->
         <div class="brand-overlay">
             <img src="https://i.ibb.co/Xr4DHqDL/1000298705-removebg-preview.png" class="brand-logo" alt="Logo">
             <span class="brand-text">SPORTIFY TV</span>
@@ -152,17 +155,30 @@
         const AD_LINK = 'https://www.effectivegatecpm.com/w6q9i150y?key=4b08b19ec61654084667a37e370d6f99'; 
         // ==========================================
 
+        // --- Smart Ad Logic ---
         let canShowAd = false;
-        setTimeout(() => { canShowAd = true; }, 240000); 
+        
+        // Ad ready after 4 minutes
+        setTimeout(() => {
+            canShowAd = true;
+            console.log("Ad Ready");
+        }, 240000); 
 
+        // Trigger Ad
         function triggerAd() {
             if (canShowAd) {
                 window.open(AD_LINK, '_blank'); 
                 canShowAd = false; 
-                setTimeout(() => { canShowAd = true; }, 900000); 
+                
+                // Ad ready again after 15 minutes
+                setTimeout(() => {
+                    canShowAd = true;
+                    console.log("Ad Ready Again");
+                }, 900000); 
             }
         }
 
+        // Container Click Handler
         function handleContainerClick() {
             triggerAd();
             toggleControls();
@@ -205,6 +221,7 @@
                 const response = await fetch(DATABASE_URL);
                 let textData = await response.text();
                 textData = textData.trim();
+                // JSON Fixer
                 if (textData.endsWith('},')) textData = textData.slice(0, -1);
                 if (!textData.endsWith(']')) textData += ']';
                 if (!textData.startsWith('[')) textData = '[' + textData;
@@ -214,6 +231,7 @@
                 
                 if (channel) {
                     let drmConfig = {};
+                    // Key Logic
                     if (channel.keys && typeof channel.keys === 'object') {
                         const keyId = Object.keys(channel.keys)[0];
                         const keyValue = channel.keys[keyId];
@@ -232,6 +250,7 @@
 
         async function loadPlayer(url, drmConfig) {
             errorMsg.style.display = 'none';
+            // Fast Start Config
             const config = {
                 streaming: { bufferingGoal: 2, rebufferingGoal: 0.01, bufferBehind: 0, lowLatencyMode: true },
                 abr: { enabled: true, defaultBandwidthEstimate: 400000 },

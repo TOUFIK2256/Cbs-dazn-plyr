@@ -22,27 +22,27 @@
         
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* --- Branding (Logo + Text) --- */
+        /* --- Branding (Moved to Left) --- */
         .brand-overlay {
             position: absolute; 
-            top: 10px; right: 10px; 
+            top: 10px; left: 10px; /* Moved to Left */
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center;
             z-index: 50; 
-            opacity: 0.7; /* Slight opacity */
+            opacity: 0.7; 
             pointer-events: none;
         }
 
         .brand-logo {
-            width: 25px; /* Logo resized smaller */
+            width: 25px; 
             height: auto;
-            margin-bottom: -2px; /* Gap reduced */
+            margin-bottom: -2px; 
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
         }
 
         .brand-text {
             font-family: 'Permanent Marker', cursive;
-            font-size: 7px; /* Font size reduced */
+            font-size: 7px;
             color: #fff;
             text-shadow: 1px 1px 2px #000;
             letter-spacing: 0.5px;
@@ -111,7 +111,7 @@
     <div class="video-container" id="video-container" onclick="handleContainerClick()">
         <video id="video" autoplay playsinline></video>
         
-        <!-- Branding (Logo + Text) -->
+        <!-- Branding (Logo Left) -->
         <div class="brand-overlay">
             <img src="https://i.ibb.co/Xr4DHqDL/1000298705-removebg-preview.png" class="brand-logo" alt="Logo">
             <span class="brand-text">SPORTIFY TV</span>
@@ -155,6 +155,27 @@
         const AD_LINK = 'https://www.effectivegatecpm.com/w6q9i150y?key=4b08b19ec61654084667a37e370d6f99'; 
         // ==========================================
 
+        // --- Language Dictionary (For Full Names) ---
+        const LANG_MAP = {
+            'en': 'English',
+            'hi': 'Hindi',
+            'bn': 'Bengali',
+            'ta': 'Tamil',
+            'te': 'Telugu',
+            'ml': 'Malayalam',
+            'kn': 'Kannada',
+            'mr': 'Marathi',
+            'gu': 'Gujarati',
+            'pa': 'Punjabi',
+            'es': 'Spanish',
+            'fr': 'French',
+            'de': 'German',
+            'it': 'Italian',
+            'ar': 'Arabic',
+            'ru': 'Russian',
+            'pt': 'Portuguese'
+        };
+
         // --- Smart Ad Logic ---
         let canShowAd = false;
         
@@ -164,12 +185,10 @@
             console.log("Ad Ready");
         }, 240000); 
 
-        // Trigger Ad
         function triggerAd() {
             if (canShowAd) {
                 window.open(AD_LINK, '_blank'); 
                 canShowAd = false; 
-                
                 // Ad ready again after 15 minutes
                 setTimeout(() => {
                     canShowAd = true;
@@ -178,7 +197,6 @@
             }
         }
 
-        // Container Click Handler
         function handleContainerClick() {
             triggerAd();
             toggleControls();
@@ -231,7 +249,6 @@
                 
                 if (channel) {
                     let drmConfig = {};
-                    // Key Logic
                     if (channel.keys && typeof channel.keys === 'object') {
                         const keyId = Object.keys(channel.keys)[0];
                         const keyValue = channel.keys[keyId];
@@ -250,7 +267,6 @@
 
         async function loadPlayer(url, drmConfig) {
             errorMsg.style.display = 'none';
-            // Fast Start Config
             const config = {
                 streaming: { bufferingGoal: 2, rebufferingGoal: 0.01, bufferBehind: 0, lowLatencyMode: true },
                 abr: { enabled: true, defaultBandwidthEstimate: 400000 },
@@ -269,10 +285,19 @@
         function showError(msg) { errorMsg.style.display = 'block'; errorMsg.innerText = msg; spinner.style.display = 'none'; }
         function openMenu(id) { closeAllMenus(); document.getElementById('popup-overlay').style.display = 'block'; document.getElementById(id).style.display = 'flex'; }
         function closeAllMenus() { document.getElementById('popup-overlay').style.display = 'none'; document.querySelectorAll('.popup-menu').forEach(m => m.style.display = 'none'); }
+        
         function updateMenus() { 
             const q = document.getElementById('quality-menu'); q.innerHTML = `<div style="padding:12px;font-weight:bold;border-bottom:1px solid #333;display:flex;justify-content:space-between">Quality <span onclick="closeAllMenus()" style="cursor:pointer">×</span></div><div class="popup-item" onclick="setQ('auto')">Auto <span class="kbps">Rec.</span></div>`; const tracks = player.getVariantTracks(); const seen = new Set(); tracks.sort((a,b) => b.height - a.height).forEach(t => { if(t.height && !seen.has(t.height)) { seen.add(t.height); q.innerHTML += `<div class="popup-item" onclick="setQ(${t.height})">${t.height}p <span class="kbps">${Math.round(t.bandwidth/1000)} kbps</span></div>`; } });
-            const a = document.getElementById('audio-menu'); a.innerHTML = `<div style="padding:12px;font-weight:bold;border-bottom:1px solid #333;display:flex;justify-content:space-between">Audio <span onclick="closeAllMenus()" style="cursor:pointer">×</span></div>`; player.getAudioLanguages().forEach(l => a.innerHTML += `<div class="popup-item" onclick="setA('${l}')">${l.toUpperCase()}</div>`);
+            
+            // --- Audio Name Logic ---
+            const a = document.getElementById('audio-menu'); 
+            a.innerHTML = `<div style="padding:12px;font-weight:bold;border-bottom:1px solid #333;display:flex;justify-content:space-between">Audio <span onclick="closeAllMenus()" style="cursor:pointer">×</span></div>`; 
+            player.getAudioLanguages().forEach(l => {
+                let fullName = LANG_MAP[l] || l.toUpperCase(); // Convert short to full
+                a.innerHTML += `<div class="popup-item" onclick="setA('${l}')">${fullName}</div>`;
+            });
         }
+
         function setQ(h) { h==='auto'?player.configure({abr:{enabled:true}}):(player.configure({abr:{enabled:false}}),player.selectVariantTrack(player.getVariantTracks().find(x=>x.height==h),true)); closeAllMenus(); }
         function setA(l) { player.selectAudioLanguage(l); closeAllMenus(); }
         function startTimer() { video.ontimeupdate = () => { if(player.isLive()) { const lat = player.seekRange().end - video.currentTime; lat < 5 ? (document.getElementById('time-display').innerHTML = '<span style="color:#e50914">●</span> LIVE', document.getElementById('seek-fill').style.width = '100%') : (document.getElementById('time-display').innerText = "-" + formatTime(lat), document.getElementById('time-display').style.color = "#ccc", document.getElementById('seek-fill').style.width = (((video.currentTime - player.seekRange().start)/(player.seekRange().end - player.seekRange().start))*100) + '%'); } else { document.getElementById('seek-fill').style.width = ((video.currentTime/video.duration)*100) + '%'; document.getElementById('time-display').innerText = formatTime(video.currentTime) + " / " + formatTime(video.duration); } }; }

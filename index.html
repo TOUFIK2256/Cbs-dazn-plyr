@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>S-PTV Player 4</title>
+    <title>S-PTV Player</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.ui.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
     
     <style>
         body { 
@@ -21,16 +22,37 @@
         
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* লোগো */
-        .logo-overlay {
+        /* --- ব্র্যান্ডিং (একদম ছোট এবং কাছাকাছি) --- */
+        .brand-overlay {
             position: absolute; 
-            top: 15px; right: 15px; 
-            width: 50px; 
+            top: 10px; right: 10px; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
             z-index: 50; 
-            opacity: 0.8; 
+            opacity: 0.7; /* একটু ঝাপসা যাতে চোখে না লাগে */
             pointer-events: none;
         }
 
+        .brand-logo {
+            width: 25px; /* লোগো আরও ছোট করা হয়েছে */
+            height: auto;
+            margin-bottom: -2px; /* লোগো এবং লেখার গ্যাপ কমানো হয়েছে */
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+        }
+
+        .brand-text {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 7px; /* লেখার সাইজ ছোট করা হয়েছে */
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            letter-spacing: 0.5px;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* স্পিনার */
         .spinner {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.2);
@@ -86,8 +108,11 @@
     <div class="video-container" id="video-container" onclick="handleContainerClick()">
         <video id="video" autoplay playsinline></video>
         
-        <!-- লোগো -->
-        <img src="https://i.ibb.co/Xr4DHqDL/1000298705-removebg-preview.png" class="logo-overlay" alt="S-PTV">
+        <!-- ব্র্যান্ডিং -->
+        <div class="brand-overlay">
+            <img src="https://i.ibb.co/Xr4DHqDL/1000298705-removebg-preview.png" class="brand-logo" alt="Logo">
+            <span class="brand-text">SPORTIFY TV</span>
+        </div>
 
         <div id="error-msg">Loading...</div>
         <div class="spinner" id="buffering-spinner"></div>
@@ -124,31 +149,17 @@
         // ==========================================
         const CF_WORKER = ''; 
         const DATABASE_URL = 'https://raw.githubusercontent.com/TOUFIK2256/Cbs-dazn/refs/heads/main/matches.json';
-        
-        // 🔥 Adsterra Smartlink
         const AD_LINK = 'https://www.effectivegatecpm.com/w6q9i150y?key=4b08b19ec61654084667a37e370d6f99'; 
         // ==========================================
 
-        // --- Smart Ad Logic ---
         let canShowAd = false;
-        
-        // ৪ মিনিট পর অ্যাড রেডি হবে
-        setTimeout(() => {
-            canShowAd = true;
-            console.log("Ad Ready");
-        }, 240000); // 4 Minutes = 240000 ms
+        setTimeout(() => { canShowAd = true; }, 240000); 
 
-        // অ্যাড ট্রিগার ফাংশন
         function triggerAd() {
             if (canShowAd) {
-                window.open(AD_LINK, '_blank'); // নতুন ট্যাবে খুলবে
-                canShowAd = false; // আবার লক হবে
-                
-                // ১৫ মিনিট পর আবার রেডি হবে
-                setTimeout(() => {
-                    canShowAd = true;
-                    console.log("Ad Ready Again");
-                }, 900000); // 15 Minutes = 900000 ms
+                window.open(AD_LINK, '_blank'); 
+                canShowAd = false; 
+                setTimeout(() => { canShowAd = true; }, 900000); 
             }
         }
 
